@@ -147,7 +147,8 @@ input[type=text],input[type=number],input[type=search],select{border:1px solid v
 #ovBar,#stBar,#txBar,#selBar{position:absolute;top:8px;left:8px;right:8px;z-index:2;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
 #ovBar .btn,#stBar .btn,#txBar .btn,#selBar .btn{padding:6px 10px;min-height:36px}
 #stBar b,#txBar b,#selBar b{flex:1;min-width:150px;font-size:14px;font-variant-numeric:tabular-nums;padding-left:4px}
-#ovBar .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+#ovBar .btn[aria-pressed="true"],#stViews .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+#stViews{display:flex;flex-wrap:wrap;gap:6px;flex-basis:100%}
 #ovBar input{flex:1;min-width:90px;accent-color:var(--accent)}
 /* The menu follows the chosen theme. */
 .menu header{border-bottom:none;padding-bottom:4px}
@@ -202,8 +203,12 @@ input[type=text],input[type=number],input[type=search],select{border:1px solid v
   <canvas id="cv" aria-label="Fabric grid. Touch to place stitches or draw backstitch lines. Use two fingers to zoom and move."></canvas>
   <div id="stBar" hidden>
     <b id="stCount"></b>
-    <button class="btn" id="stView" type="button">Done: faded</button>
     <button class="btn" id="stExit" type="button">Back to design</button>
+    <div id="stViews" role="group" aria-label="How done stitches look">
+      <button class="btn" type="button" data-view="0" aria-pressed="true">Done: faded</button>
+      <button class="btn" type="button" data-view="1" aria-pressed="false">Done: full colour</button>
+      <button class="btn" type="button" data-view="2" aria-pressed="false">Done only</button>
+    </div>
   </div>
   <div id="ovBar" hidden>
     <button class="btn" id="ovMove" type="button" aria-pressed="false">Move picture</button>
@@ -1633,13 +1638,15 @@ function commitTick(){ if(!tk) return; const m=tk.map; if(m.size){ const idx=new
 function cancelTick(){ if(!tk) return; tk.map.forEach((b,i)=>P.done[i]=b); tk=null; last=null; showCount(); redraw(); }
 function showCount(){ if(mode!=="stitch") return; const g=progress(P); $("stCount").textContent=g.done+" done, "+g.left+" left, "+g.pct+"%"; }
 const VIEWS=["Done: faded","Done: full colour","Done only"];
-function modeUI(){ const s=mode==="stitch"; $("stTools").hidden=!s; $("dsTools").hidden=s; $("paletteRow").hidden=s; $("stBar").hidden=!s; $("stView").textContent=VIEWS[doneView];
+function modeUI(){ const s=mode==="stitch"; $("stTools").hidden=!s; $("dsTools").hidden=s; $("paletteRow").hidden=s; $("stBar").hidden=!s; viewUI();
   document.querySelectorAll("#stTools [data-st]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.st===stTool?"true":"false")); ovUI(); showCount(); resize(); redraw(); }
 function enterStitch(){ if(txt) endText(); if(sel) endSel(); if(counts(P)[0]===P.cells.length&&!P.lines.length){ toast("Add some stitches to the design first"); return; } closeSheet(); cancelStroke(); draft=null; mode="stitch"; modeUI(); toast(P.lines.length?"Tap stitches and lines to tick them off":"Tap stitches to tick them off"); }
 function exitStitch(){ cancelTick(); mode="design"; modeUI(); }
 document.querySelectorAll("#stTools [data-st]").forEach(b=>b.onclick=()=>{ stTool=b.dataset.st; modeUI(); });
 $("mStitch").onclick=enterStitch; $("stExit").onclick=exitStitch;
-$("stView").onclick=()=>{ doneView=(doneView+1)%3; $("stView").textContent=VIEWS[doneView]; redraw(); };
+/* how done stitches look: three buttons, one active at a time */
+function viewUI(){ document.querySelectorAll("#stViews .btn").forEach(b=>b.setAttribute("aria-pressed",Number(b.dataset.view)===doneView?"true":"false")); }
+$("stViews").onclick=e=>{ const b=e.target.closest("[data-view]"); if(!b) return; doneView=Number(b.dataset.view); viewUI(); redraw(); };
 
 /* themes */
 const SKINS=[["pink","Pink","#F7DDE2","#8F1A2E"],["lavender","Lavender","#ECE9F8","#4B3FA3"],["mint","Mint","#E3F3EC","#17685A"],["sky","Sky blue","#E3EEF8","#1F5C94"],["classic","Classic grey","#eef0f4","#b3203a"],["dark","Dark","#141821","#ff6b81"]];
