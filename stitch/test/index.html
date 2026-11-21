@@ -207,7 +207,7 @@ input[type=text],input[type=number],input[type=search],select{border:1px solid v
   </div>
   <div id="ovBar" hidden>
     <button class="btn" id="ovMove" type="button" aria-pressed="false">Move picture</button>
-    <button class="btn" id="ovShow" type="button">Hide picture</button>
+    <button class="btn" id="ovShow" type="button" aria-pressed="false">Hide picture</button>
     <button class="btn" id="ovPat" type="button" aria-pressed="false">Hide pattern</button>
     <input type="range" id="ovAlpha" min="10" max="90" value="45" aria-label="How strong the picture looks">
     <button class="btn" id="ovDel" type="button">Remove</button>
@@ -1729,7 +1729,7 @@ $("gSave").onclick=async()=>{ const r=await offer(fileBase()+"-project.json",JSO
 /* trace a photo: a picture shown under the grid as a guide */
 let ovT=0;
 function ovUI(){ $("ovBar").hidden=!ov||mode!=="design"||!!txt||!!sel; if(!ov) return; $("ovMove").textContent=ov.moving?"Done":"Move picture"; $("ovMove").setAttribute("aria-pressed",ov.moving?"true":"false");
-  $("ovShow").textContent=ov.vis?"Hide picture":"Show picture"; $("ovPat").textContent=ov.pat===false?"Show pattern":"Hide pattern"; $("ovPat").setAttribute("aria-pressed",ov.pat===false?"true":"false"); $("ovAlpha").value=Math.round(ov.a*100); }
+  $("ovShow").textContent=ov.vis?"Hide picture":"Show picture"; $("ovShow").setAttribute("aria-pressed",ov.vis?"false":"true"); $("ovPat").textContent=ov.pat===false?"Show pattern":"Hide pattern"; $("ovPat").setAttribute("aria-pressed",ov.pat===false?"true":"false"); $("ovAlpha").value=Math.round(ov.a*100); }
 function saveOverlay(){ clearTimeout(ovT); ovT=setTimeout(()=>{ if(!ov){ try{ localStorage.removeItem(KEY+"overlay"); }catch(e){} return; }
     if(ov.d) store(KEY+"overlay",JSON.stringify({d:ov.d,x:ov.x,y:ov.y,w:ov.w,h:ov.h,a:ov.a,v:ov.vis})); },400); }
 function clearOverlay(){ const had=!!ov; ov=null; ovDrag=null; ovPinch=null; ovUI(); if(had){ saveOverlay(); redraw(); } }
