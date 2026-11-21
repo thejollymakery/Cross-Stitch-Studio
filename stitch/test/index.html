@@ -401,11 +401,14 @@ input[type=text],input[type=number],input[type=search],select{border:1px solid v
   </div>
 </section>
 
-<section class="sheet" id="sheet-also" hidden aria-label="Save the project file too?">
-  <header><h2>Save the project file too?</h2><button class="btn" data-close type="button">Not now</button></header>
+<section class="sheet" id="sheet-also" hidden aria-label="Save these too?">
+  <header><h2>Save these too?</h2><button class="btn" data-close type="button">Done</button></header>
   <div class="body">
-    <p>The pattern is saved. The project file is the design itself. With it you can open the design here again, change it, or tick stitches off on screen as you sew.</p>
+    <p>The pattern is saved. Two more files go well with it.</p>
+    <p><b>The project file</b> is the design itself. With it you can open the design here again, change it, or tick stitches off on screen as you sew.</p>
     <button class="btn primary" id="alsoGo" type="button">Save the project file</button>
+    <p><b>The "how to" guide</b> shows how to use the pattern on paper and on screen, in two pages.</p>
+    <button class="btn primary" id="alsoGuide" type="button">Save the "how to" guide</button>
   </div>
 </section>
 
@@ -2175,7 +2178,11 @@ $("prGo").onclick=async()=>{ const q=paperNow(), px=v=>Math.round(v/25.4*200); c
       if(!report(r)){ if(r==="saved") openSheet("sheet-also"); return; } } }catch(e){}
   showPics(pages); };
 
-$("alsoGo").onclick=()=>$("mBackup").onclick();
+/* after a pattern is saved: the project file and the "how to" guide are offered. The sheet stays open, so both can be saved one after the other */
+$("alsoGo").onclick=async()=>{ if(report(await offer(fileBase()+"-project.json",JSON.stringify(pack(P))))) toast("Project files cannot be saved in this view"); };
+$("alsoGuide").onclick=async()=>{ let b; try{ const res=await fetch("/stitch/how-to-use-your-pattern.pdf",{cache:"no-cache"}); if(!res.ok) throw new Error("no guide"); b=await res.blob(); }
+  catch(e){ toast("The guide needs an internet connection. Try again when you are online"); return; }
+  if(report(await offer("How to use your pattern - The Jolly Makery.pdf",b))) toast("The guide cannot be saved in this view"); };
 $("mBackup").onclick=async()=>{ closeSheet(); const txt=JSON.stringify(pack(P)); if(!report(await offer(fileBase()+"-project.json",txt))) return; toast("Project files cannot be saved in this view"); };
 $("mRestore").onclick=()=>$("restoreFile").click();
 $("restoreFile").onchange=e=>{ const f=e.target.files[0]; e.target.value=""; if(!f) return; const rd=new FileReader();
