@@ -249,7 +249,6 @@ input[type=text],input[type=number],input[type=search],select{border:1px solid v
   <button type="button" data-st="col" aria-pressed="false">Column</button>
   <button type="button" data-st="square" aria-pressed="false">Square</button>
   <button type="button" data-st="move" aria-pressed="false">Move</button>
-  <button type="button" id="symBtn2" aria-pressed="false">Symbols</button>
 </nav>
 
 <nav class="tools" id="dsTools" aria-label="Tools">
@@ -1679,7 +1678,7 @@ function twoTap(btn,fn){ if(btn.dataset.armed){ delete btn.dataset.armed; btn.te
   setTimeout(()=>{ if(btn.dataset.armed){ delete btn.dataset.armed; btn.textContent=btn.dataset.label; } },3000); }
 
 document.querySelectorAll(".tools [data-tool]").forEach(b=>b.onclick=()=>{ setTool(b.dataset.tool); redraw(); if(b.dataset.tool==="line") toast("Drag from one corner to another"); });
-$("symBtn").onclick=$("symBtn2").onclick=()=>{ sym=!sym; $("symBtn").setAttribute("aria-pressed",sym?"true":"false"); { const t=sym?"Hide symbols":"Show symbols"; $("symBtn").querySelector(".symtx").textContent=t; $("symBtn").title=t; $("symBtn").setAttribute("aria-label",t); } $("symBtn2").setAttribute("aria-pressed",sym?"true":"false"); if(sym&&view.s*dpr<12) toast("Zoom in to see the symbols"); redraw(); };
+$("symBtn").onclick=()=>{ sym=!sym; $("symBtn").setAttribute("aria-pressed",sym?"true":"false"); { const t=sym?"Hide symbols":"Show symbols"; $("symBtn").querySelector(".symtx").textContent=t; $("symBtn").title=t; $("symBtn").setAttribute("aria-label",t); } if(sym&&view.s*dpr<12) toast("Zoom in to see the symbols"); redraw(); };
 $("undo").onclick=doUndo; $("redo").onclick=doRedo;
 /* keyboard: Ctrl+Z is Undo, Ctrl+Y or Ctrl+Shift+Z is Redo (Cmd on a Mac). Not while typing in a box, and not while a sheet is open. It does what the buttons do, so it follows the same rules */
 document.addEventListener("keydown",e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=(e.key||"").toLowerCase(); if(k!=="z"&&k!=="y") return;
