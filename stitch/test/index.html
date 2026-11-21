@@ -148,7 +148,14 @@ input[type=text],input[type=number],input[type=search],select{border:1px solid v
 #ovBar .btn,#stBar .btn,#txBar .btn,#selBar .btn{padding:6px 10px;min-height:36px}
 #stBar b,#txBar b,#selBar b{flex:1;min-width:150px;font-size:14px;font-variant-numeric:tabular-nums;padding-left:4px}
 #ovBar .btn[aria-pressed="true"],#stViews .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-#stViews{display:flex;flex-wrap:wrap;gap:6px;flex-basis:100%}
+/* Cross Stitch it bar: counter, the three "done" buttons and Back to design on one line. On a narrow phone the buttons drop to a second line */
+#stBar #stCount{order:1;flex:0 1 auto;min-width:0;padding-right:8px}
+#stViews{order:2;display:flex;flex-wrap:wrap;gap:6px;margin-right:auto}
+#stExit{order:3}
+@media (max-width:640px){ #stBar #stCount{flex:1;min-width:150px} #stExit{order:2} #stViews{order:3;flex-basis:100%;margin-right:0} }
+/* the symbols button in the header: words on a wide screen, the small picture on a phone, where there is no room for words */
+.symtx{display:none}
+@media (min-width:761px){ #symBtn{width:auto;padding:0 12px} #symBtn svg{display:none} .symtx{display:inline} }
 #ovBar input{flex:1;min-width:90px;accent-color:var(--accent)}
 /* The menu follows the chosen theme. */
 .menu header{border-bottom:none;padding-bottom:4px}
@@ -193,7 +200,7 @@ input[type=text],input[type=number],input[type=search],select{border:1px solid v
     <h1 id="pname">Cross Stitch</h1>
     <p id="pinfo"></p>
   </div>
-  <button class="btn icon" id="symBtn" type="button" aria-pressed="false" aria-label="Show symbols" title="Show symbols"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="16" height="16" rx="2"/><line x1="10" y1="2" x2="10" y2="18"/><line x1="2" y1="10" x2="18" y2="10"/><circle cx="6" cy="6" r="1.4" fill="currentColor"/><path d="M12.6 12.6l2.8 2.8M15.4 12.6l-2.8 2.8"/></svg></button>
+  <button class="btn icon" id="symBtn" type="button" aria-pressed="false" aria-label="Show symbols" title="Show symbols"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="16" height="16" rx="2"/><line x1="10" y1="2" x2="10" y2="18"/><line x1="2" y1="10" x2="18" y2="10"/><circle cx="6" cy="6" r="1.4" fill="currentColor"/><path d="M12.6 12.6l2.8 2.8M15.4 12.6l-2.8 2.8"/></svg><span class="symtx">Show symbols</span></button>
   <button class="btn" id="undo" type="button">Undo</button>
   <button class="btn" id="redo" type="button">Redo</button>
   <button class="btn primary" id="menuBtn" type="button">Menu</button>
@@ -1672,7 +1679,7 @@ function twoTap(btn,fn){ if(btn.dataset.armed){ delete btn.dataset.armed; btn.te
   setTimeout(()=>{ if(btn.dataset.armed){ delete btn.dataset.armed; btn.textContent=btn.dataset.label; } },3000); }
 
 document.querySelectorAll(".tools [data-tool]").forEach(b=>b.onclick=()=>{ setTool(b.dataset.tool); redraw(); if(b.dataset.tool==="line") toast("Drag from one corner to another"); });
-$("symBtn").onclick=$("symBtn2").onclick=()=>{ sym=!sym; $("symBtn").setAttribute("aria-pressed",sym?"true":"false"); $("symBtn2").setAttribute("aria-pressed",sym?"true":"false"); if(sym&&view.s*dpr<12) toast("Zoom in to see the symbols"); redraw(); };
+$("symBtn").onclick=$("symBtn2").onclick=()=>{ sym=!sym; $("symBtn").setAttribute("aria-pressed",sym?"true":"false"); { const t=sym?"Hide symbols":"Show symbols"; $("symBtn").querySelector(".symtx").textContent=t; $("symBtn").title=t; $("symBtn").setAttribute("aria-label",t); } $("symBtn2").setAttribute("aria-pressed",sym?"true":"false"); if(sym&&view.s*dpr<12) toast("Zoom in to see the symbols"); redraw(); };
 $("undo").onclick=doUndo; $("redo").onclick=doRedo;
 /* keyboard: Ctrl+Z is Undo, Ctrl+Y or Ctrl+Shift+Z is Redo (Cmd on a Mac). Not while typing in a box, and not while a sheet is open. It does what the buttons do, so it follows the same rules */
 document.addEventListener("keydown",e=>{ if(!(e.ctrlKey||e.metaKey)||e.altKey) return; const k=(e.key||"").toLowerCase(); if(k!=="z"&&k!=="y") return;
